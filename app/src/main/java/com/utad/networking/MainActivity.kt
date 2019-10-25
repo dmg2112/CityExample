@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 import androidx.core.app.ComponentActivity.ExtraData
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import com.utad.networking.CitiesAdapter as CitiesAdapter
 
 
 class MainActivity : AppCompatActivity() {
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity() {
 
         mySearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
+                Toast.makeText(this@MainActivity, "$query", Toast.LENGTH_SHORT).show()
                 return false
             }
 
@@ -38,19 +40,20 @@ class MainActivity : AppCompatActivity() {
 
         citiesRecyclerView.layoutManager = LinearLayoutManager(this)
         citiesRecyclerView.setHasFixedSize(true)
-        val citiesAdapter = CitiesAdapter {
-            Toast.makeText(this, "${it.title} clicked!!", Toast.LENGTH_SHORT).show()
+
+        citiesRecyclerView.adapter = CitiesAdapter{
+            
         }
 
 
 
-        citiesRecyclerView.adapter = citiesAdapter
+
 
         val weatherApi = RetrofitFactory.getWeatherApi()
         CoroutineScope(Dispatchers.IO).launch {
             val response = weatherApi.searchCities()
             withContext(Dispatchers.Main) {
-                citiesAdapter.addCities(response.body()!!)
+                CitiesAdapter.addCities(response.body()!!)
             }
         }
     }
